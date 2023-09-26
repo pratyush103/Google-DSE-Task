@@ -1,0 +1,381 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Inventory Management Client</title>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.1.3/dist/css/bootstrap.min.css" integrity="sha384-MCw98/SFnGE8fJT3GXwEOngsV7Zt27NXFoaoApmYm81iuXoPkFOJwJ8ERdknLPMO" crossorigin="anonymous">
+  <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js" integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo" crossorigin="anonymous"></script>
+<script src="https://cdn.jsdelivr.net/npm/popper.js@1.14.3/dist/umd/popper.min.js" integrity="sha384-ZMP7rVo3mIykV+2+9J3UJ46jBk0WLaUAdn689aCwoqbBJiSnjAK/l8WvCWPIPm49" crossorigin="anonymous"></script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@4.1.3/dist/js/bootstrap.min.js" integrity="sha384-ChfqqxuZUCnJSK3+MXmPNIyE6ZbWh2IMqE241rYiqJxyMiZ6OW/JmZQ5stwEULTy" crossorigin="anonymous"></script>
+  <style>
+    body{
+      padding-left: 5%;
+      padding-right: 5%;
+    }
+    
+  </style>
+</head>
+<body>
+  <div class="sticky-top">
+  <div class=" text-primary border-bottom" style="background-color: white;">
+  <h1>Inventory Management</h1>
+</div>
+ <!-- Display Response Messages -->
+ <div id="responseMessage" class="alert-info"></div>
+</div>
+<br>
+<div class="container">
+  
+  <div class="row align-items-start">
+  <div class="col">
+    <!-- Add Item Form -->
+  <h2>Add Item</h2>
+  <form id="addItemForm">
+    <label for="name" class="col-form-label">Name:</label>
+    <input type="text" id="name" name="name" class="form-control" required><br>
+
+    <label for="stock">Stock:</label>
+    <input type="number" id="stock" name="stock" class="form-control" required><br>
+
+    <label for="price">Price:</label>
+    <input type="number" step="0.01" id="price" name="price"  class="form-control" required><br>
+
+    <button type="submit" class="btn btn-primary">Add Item</button>
+  </form>
+</div>
+
+<div class="col">
+  <!-- Display All Items -->
+  <h2>All Items</h2>
+  <table id="itemTable" class="table table-dark table-stripe table-hover">
+    <thead>
+      <tr>
+        <th>ID</th>
+        <th>Name</th>
+        <th>Stock</th>
+        <th>Price</th>
+      </tr>
+    </thead>
+    <tbody></tbody>
+  </table>
+</div>
+</div><br><br>
+
+
+  <!-- Delete Item Form -->
+  <h2>Delete Item</h2>
+  <form id="deleteItemForm">
+    <label for="itemId">Item ID:</label>
+    <input type="number" id="itemId" name="itemId" class="form-control" required><br>
+
+    <button type="submit" class="btn btn-danger">Delete Item</button>
+  </form>
+</div>
+<br><hr><br>
+<div class="container">
+  
+  <div class="row align-items-start">
+  <div class="col">
+
+  <!-- Create Invoice Form -->
+<h2>Create Invoice</h2>
+<form id="createInvoiceForm">
+  <label for="items" class="col-form-label">Items (comma-separated item IDs):</label>
+  <input type="text" id="items" name="items" class="form-control" required><br>
+
+  <!-- Add fields for taxes and discount percentage -->
+  <label for="taxes" class="col-form-label">Taxes (%)</label>
+  <input type="number" step="0.01" id="taxes" name="taxes" class="form-control" required><br>
+
+  <label for="discount" class="col-form-label">Discount (%)</label>
+  <input type="number" step="0.01" id="discount" name="discount" class="form-control" required><br>
+
+  <button type="submit" class="btn btn-primary">Create Invoice</button>
+</form>
+
+  </div>
+
+  <!-- Display All Invoices -->
+  <div class="col">
+
+    <h2>All Invoices</h2>
+    <table id="invoiceTable" class="table table-dark table-stripe table-hover">
+      <thead>
+        <tr>
+          <th>ID</th>
+          <th>Items</th>
+          <th>Subtotal</th>
+          <th>Taxes (%)</th>
+          <th>Discount (%)</th>
+          <th>Total</th>
+        </tr>
+      </thead>
+      <tbody></tbody>
+    </table>
+  </div>
+  </div>
+<br>
+  
+<!-- Delete Invoice Form -->
+<h2>Delete Invoice</h2>
+<form id="deleteInvoiceForm">
+  <label for="invoiceIdToDelete">Invoice ID:</label>
+  <input type="number" id="invoiceIdToDelete" name="invoiceIdToDelete" class="form-control" required><br>
+
+  <button type="submit"class="btn btn-danger">Delete Invoice</button>
+</form>
+<br><hr><br>
+</div>
+  <!-- Manage Operation Form -->
+  <h2>Manage Operation</h2>
+  <form id="manageOperationForm">
+    <label for="invoiceId">Invoice ID:</label>
+    <input type="number" id="invoiceId" name="invoiceId" class="form-control" required><br>
+
+    <label for="manageItems">Manage Items:</label>
+    <input type="text" id="manageItems" name="manageItems" placeholder="item1:quantity1,item2:quantity2" class="form-control" required><br>
+
+    <button type="submit" class="btn btn-primary">Perform Manage Operation</button>
+  </form>
+  <br><hr><br>
+
+  
+
+  
+
+ 
+
+  <!-- JavaScript to interact with the API -->
+  <script>
+    const addItemForm = document.getElementById('addItemForm');
+    const createInvoiceForm = document.getElementById('createInvoiceForm');
+    const manageOperationForm = document.getElementById('manageOperationForm');
+    const deleteItemForm = document.getElementById('deleteItemForm');
+    const deleteInvoiceForm = document.getElementById('deleteInvoiceForm');
+    const itemTable = document.getElementById('itemTable').getElementsByTagName('tbody')[0];
+    const invoiceTable = document.getElementById('invoiceTable').getElementsByTagName('tbody')[0];
+    const responseMessage = document.getElementById('responseMessage');
+
+    // Function to fetch all items and display them
+    function getAllItems() {
+      fetch('http://localhost:5000/items')
+        .then(response => response.json())
+        .then(items => {
+          itemTable.innerHTML = items.map(item => `
+            <tr>
+              <td>${item.id}</td>
+              <td>${item.name}</td>
+              <td>${item.stock}</td>
+              <td>₹${item.price}</td>
+            </tr>
+          `).join('');
+        })
+        .catch(error => {
+          console.error('Error fetching items:', error);
+        });
+    }
+
+    // Function to fetch all invoices and display them
+    function getAllInvoices() {
+      fetch('http://localhost:5000/invoices')
+        .then(response => response.json())
+        .then(invoices => {
+          invoiceTable.innerHTML = invoices.map(invoice => `
+            <tr>
+              <td>${invoice.id}</td>
+              <td>${invoice.items}</td>
+              <td>₹${invoice.subtotal}</td>
+              <td>${invoice.taxes}%</td>
+              <td>${invoice.discount}%</td>
+              <td>₹${invoice.total}</td>
+            </tr>
+          `).join('');
+        })
+        .catch(error => {
+          console.error('Error fetching invoices:', error);
+        });
+    }
+
+    // Function to add an item
+    addItemForm.addEventListener('submit', function (e) {
+      e.preventDefault();
+      const formData = new FormData(addItemForm);
+
+      fetch('http://localhost:5000/items', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(Object.fromEntries(formData)),
+      })
+        .then(response => response.json())
+        .then(data => {
+          responseMessage.textContent = `Item added successfully with ID: ${data.id}`;
+          getAllItems(); // Refresh the item list
+          addItemForm.reset();
+        })
+        .catch(error => {
+          console.error('Error adding item:', error);
+        });
+    });
+
+// Function to create an invoice
+createInvoiceForm.addEventListener('submit', function (e) {
+  e.preventDefault();
+
+  const itemIds = document.getElementById('items').value.split(',').map(id => id.trim());
+  const taxes = parseFloat(document.getElementById('taxes').value);
+  const discount = parseFloat(document.getElementById('discount').value);
+
+  // Fetch prices and stock for the entered item IDs
+  const fetchItemDataPromises = itemIds.map(itemId => {
+    return fetch(`http://localhost:5000/items/${itemId}`)
+      .then(response => {
+        if (!response.ok) {
+          throw new Error(`Error fetching item data for Item ID ${itemId}`);
+        }
+        return response.json();
+      })
+      .then(itemData => {
+        return { ...itemData, itemId }; // Include the item ID in the response
+      })
+      .catch(error => {
+        console.error(`Error fetching item data for Item ID ${itemId}:`, error);
+        return null; // Return null for items that couldn't be fetched
+      });
+  });
+
+  Promise.all(fetchItemDataPromises)
+    .then(itemResponses => {
+      // Filter out items that couldn't be fetched
+      const validItemsData = itemResponses.filter(response => response !== null);
+
+      // Check if there are any valid items
+      if (validItemsData.length === 0) {
+        responseMessage.textContent = 'Error: No valid items found.';
+        return;
+      }
+
+      // Calculate subtotal by summing the product of price and quantity (stock)
+      const subtotal = validItemsData.reduce((total, item) => {
+        const price = item.price || 0;
+        const quantity = item.stock || 0;
+        return total + price * quantity;
+      }, 0);
+
+      // Calculate total after taxes and discount
+      const total = subtotal * (1 + taxes / 100) * (1 - discount / 100);
+
+      // Prepare invoice data
+      const invoiceData = {
+        items: validItemsData.map(item => `${item.itemId} (${item.stock} items)`).join(', '),
+        subtotal: subtotal.toFixed(2),
+        taxes: taxes.toFixed(2),
+        discount: discount.toFixed(2),
+        total: total.toFixed(2),
+      };
+
+      // POST request to create the invoice
+      fetch('http://localhost:5000/invoices', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(invoiceData),
+      })
+        .then(response => {
+          if (!response.ok) {
+            throw new Error('Error creating invoice');
+          }
+          return response.json();
+        })
+        .then(data => {
+          responseMessage.textContent = `Invoice created successfully with ID: ${data.id}`;
+          createInvoiceForm.reset();
+          getAllInvoices(); // Refresh the invoice list
+        })
+        .catch(error => {
+          console.error('Error creating invoice:', error);
+        });
+    })
+    .catch(error => {
+      console.error('Error fetching item data:', error);
+    });
+});
+
+
+// Function to perform a Manage operation
+manageOperationForm.addEventListener('submit', function (e) {
+  e.preventDefault();
+  const formData = new FormData(manageOperationForm);
+
+  fetch('http://localhost:5000/manage/updateItems', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify(Object.fromEntries(formData)),
+  })
+    .then(response => {
+      if (!response.ok) {
+        throw new Error('Request failed'); // Handle non-200 status codes
+      }
+      return response.json();
+    })
+    .then(data => {
+      responseMessage.textContent = 'Manage operation completed successfully';
+      manageOperationForm.reset();
+      getAllItems(); // Refresh the item list
+    })
+    .catch(error => {
+      console.error('Error performing manage operation:', error);
+      responseMessage.textContent = 'Error: Unable to perform the manage operation';
+    });
+});
+
+
+    // Function to delete an item
+    deleteItemForm.addEventListener('submit', function (e) {
+      e.preventDefault();
+      const itemIdToDelete = document.getElementById('itemId').value;
+
+      fetch(`http://localhost:5000/items/${itemIdToDelete}`, {
+        method: 'DELETE',
+      })
+        .then(response => response.json())
+        .then(data => {
+          responseMessage.textContent = `Item with ID ${itemIdToDelete} deleted successfully`;
+          getAllItems(); // Refresh the item list
+          deleteItemForm.reset();
+        })
+        .catch(error => {
+          console.error('Error deleting item:', error);
+        });
+    });
+
+    // Function to delete an invoice
+    deleteInvoiceForm.addEventListener('submit', function (e) {
+      e.preventDefault();
+      const invoiceIdToDelete = document.getElementById('invoiceIdToDelete').value;
+
+      fetch(`http://localhost:5000/invoices/${invoiceIdToDelete}`, {
+        method: 'DELETE',
+      })
+        .then(response => response.json())
+        .then(data => {
+          responseMessage.textContent = `Invoice with ID ${invoiceIdToDelete} deleted successfully`;
+          getAllInvoices(); // Refresh the invoice list
+          deleteInvoiceForm.reset();
+        })
+        .catch(error => {
+          console.error('Error deleting invoice:', error);
+        });
+    });
+
+    // Initial fetch to populate item and invoice lists
+    getAllItems();
+    getAllInvoices();
+  </script>
+</body>
+</html>
