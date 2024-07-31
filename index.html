@@ -148,6 +148,8 @@
 
   <!-- JavaScript to interact with the API -->
   <script>
+    const baseUrl = 'https://google-dse-task.onrender.com'; // Replace 'example.com' with your actual base URL
+
     const addItemForm = document.getElementById('addItemForm');
     const createInvoiceForm = document.getElementById('createInvoiceForm');
     const manageOperationForm = document.getElementById('manageOperationForm');
@@ -159,7 +161,7 @@
 
     // Function to fetch all items and display them
     function getAllItems() {
-      fetch('http://localhost:5000/items')
+      fetch(`${baseUrl}/items`)
         .then(response => response.json())
         .then(items => {
           itemTable.innerHTML = items.map(item => `
@@ -178,7 +180,7 @@
 
     // Function to fetch all invoices and display them
     function getAllInvoices() {
-      fetch('http://localhost:5000/invoices')
+      fetch(`${baseUrl}/invoices`)
         .then(response => response.json())
         .then(invoices => {
           invoiceTable.innerHTML = invoices.map(invoice => `
@@ -202,7 +204,7 @@
       e.preventDefault();
       const formData = new FormData(addItemForm);
 
-      fetch('http://localhost:5000/items', {
+      fetch(`${baseUrl}/items`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -230,7 +232,7 @@ createInvoiceForm.addEventListener('submit', function (e) {
 
   // Fetch prices and stock for the entered item IDs
   const fetchItemDataPromises = itemIds.map(itemId => {
-    return fetch(`http://localhost:5000/items/${itemId}`)
+    return fetch(`${baseUrl}/items/${itemId}`)
       .then(response => {
         if (!response.ok) {
           throw new Error(`Error fetching item data for Item ID ${itemId}`);
@@ -277,7 +279,7 @@ createInvoiceForm.addEventListener('submit', function (e) {
       };
 
       // POST request to create the invoice
-      fetch('http://localhost:5000/invoices', {
+      fetch('${baseUrl}/invoices', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -310,7 +312,7 @@ manageOperationForm.addEventListener('submit', function (e) {
   e.preventDefault();
   const formData = new FormData(manageOperationForm);
 
-  fetch('http://localhost:5000/manage/updateItems', {
+  fetch('${baseUrl}/manage/updateItems', {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
@@ -340,7 +342,7 @@ manageOperationForm.addEventListener('submit', function (e) {
       e.preventDefault();
       const itemIdToDelete = document.getElementById('itemId').value;
 
-      fetch(`http://localhost:5000/items/${itemIdToDelete}`, {
+      fetch(`${baseUrl}/items/${itemIdToDelete}`, {
         method: 'DELETE',
       })
         .then(response => response.json())
@@ -359,7 +361,7 @@ manageOperationForm.addEventListener('submit', function (e) {
       e.preventDefault();
       const invoiceIdToDelete = document.getElementById('invoiceIdToDelete').value;
 
-      fetch(`http://localhost:5000/invoices/${invoiceIdToDelete}`, {
+      fetch(`${baseUrl}/invoices/${invoiceIdToDelete}`, {
         method: 'DELETE',
       })
         .then(response => response.json())
